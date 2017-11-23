@@ -47,7 +47,7 @@ mod test {
             //            }).unwrap()
             .finalize().unwrap();
         let mut proof_builder = ProofBuilder::new().unwrap();
-        proof_builder.add_claim("issuer_key_id_1", &claim, &claim_attributes_values,
+        proof_builder.add_claim("issuer_key_id_1", &mut claim, &claim_attributes_values,
                                 &issuer_pub,
                                 None,
                                 &proof_attrs).unwrap();

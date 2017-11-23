@@ -154,15 +154,15 @@ impl ProofBuilder {
         })
     }
 
-    pub fn add_claim(&mut self, uuid: &str, claim: &Claim, claim_attributes_values: &ClaimAttributesValues, pub_key: &IssuerPublicKey,
+    pub fn add_claim(&mut self, uuid: &str, claim: &mut Claim, claim_attributes_values: &ClaimAttributesValues, pub_key: &IssuerPublicKey,
                      r_reg: Option<&RevocationRegistryPublic>, attrs_with_predicates: &ProofAttrs) -> Result<(), IndyCryptoError> {
         let mut non_revoc_init_proof = None;
         let mut m2_tilde: Option<BigNumber> = None;
 
-        if let (&Some(ref r_claim), &Some(ref r_reg), &Some(ref r_pub_key)) = (&claim.r_claim,
+        if let (&mut Some(ref mut r_claim), &Some(ref r_reg), &Some(ref r_pub_key)) = (&mut claim.r_claim,
                                                                                &r_reg,
                                                                                &pub_key.r_key) {
-            let proof = ProofBuilder::_init_non_revocation_proof(&mut r_claim.clone(), &r_reg, &r_pub_key)?;//TODO:FIXME
+            let proof = ProofBuilder::_init_non_revocation_proof(r_claim, &r_reg, &r_pub_key)?;
 
             self.c_list.extend_from_slice(&proof.as_c_list()?);
             self.tau_list.extend_from_slice(&proof.as_tau_list()?);

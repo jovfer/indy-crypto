@@ -924,17 +924,18 @@ pub extern fn indy_crypto_anoncreds_proof_builder_add_claim(proof_builder_p: *co
     check_useful_c_ptr!(proof_builder_p, ErrorCode::CommonInvalidParam1);
     check_useful_c_str!(uuid, ErrorCode::CommonInvalidParam2);
 
-    check_useful_c_reference!(claim_p, Claim, ErrorCode::CommonInvalidParam3);
+    check_useful_c_ptr!(claim_p, ErrorCode::CommonInvalidParam3);
     check_useful_c_reference!(claim_attributes_values_p, ClaimAttributesValues, ErrorCode::CommonInvalidParam3);
     check_useful_c_reference!(pub_key_p, IssuerPublicKey, ErrorCode::CommonInvalidParam3);
     check_useful_opt_c_reference!(r_reg_p, RevocationRegistryPublic, ErrorCode::CommonInvalidParam3);
     check_useful_c_reference!(attrs_with_predicates_p, ProofAttrs, ErrorCode::CommonInvalidParam3);
 
     let mut proof_builder = unsafe { Box::from_raw(proof_builder_p as *mut ProofBuilder) };
+    let mut claim_p = unsafe { Box::from_raw(claim_p as *mut Claim) };
 
     let res = match ProofBuilder::add_claim(&mut proof_builder,
                                             &uuid,
-                                            claim_p,
+                                            &mut claim_p,
                                             claim_attributes_values_p,
                                             pub_key_p,
                                             r_reg_p,
