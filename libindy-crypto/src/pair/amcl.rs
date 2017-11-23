@@ -31,9 +31,12 @@ use serde::de::{Deserialize, Deserializer, Visitor, Error as DError};
 use std::fmt;
 
 fn random_mod_order() -> Result<BIG, IndyCryptoError> {
-    let mut seed = vec![0; MODBYTES];
+    let mut seed: Vec<u8> = Vec::new();
     let mut os_rng = OsRng::new().unwrap();
-    os_rng.fill_bytes(&mut seed.as_mut_slice());
+    for i in 0..MODBYTES {
+        let cur: u8 = os_rng.gen();
+        seed.push(cur);
+    }
     let mut rng = RAND::new();
     rng.clean();
     rng.seed(MODBYTES, &seed);
@@ -417,11 +420,16 @@ impl GroupOrderElement {
         let len = vec.len();
         if len < MODBYTES {
             let diff = MODBYTES - len;
-            let mut result = vec![0; diff];
-            result.append(&mut vec);
+            let mut result = Vec::new();
+            for _ in 0..diff {
+                result.push(0);
+            }
+            for el in vec {
+                result.push(el);
+            }
             return Ok(
                 GroupOrderElement {
-                    bn: BIG::frombytes(&result)
+                    bn: BIG::frombytes(result.as_slice())
                 }
             );
         }

@@ -248,6 +248,7 @@ pub extern fn indy_crypto_anoncreds_prover_proof_builder_add_claim(proof_builder
         Ok(()) => ErrorCode::Success,
         Err(err) => err.to_error_code()
     };
+    Box::into_raw(proof_builder);
 
     trace!("indy_crypto_anoncreds_prover_proof_builder_add_claim: <<< res: {:?}", res);
     res
@@ -290,6 +291,7 @@ pub extern fn indy_crypto_anoncreds_prover_proof_builder_finalize(proof_builder_
         }
         Err(err) => err.to_error_code()
     };
+    Box::into_raw(proof_builder);
 
     trace!("indy_crypto_anoncreds_prover_proof_builder_finalize: <<< res: {:?}", res);
     res
@@ -435,43 +437,45 @@ mod tests {
     //        let nonce = _nonce();
     //        _free_proof_builder(proof_builder, nonce, master_secret);
     //    }
-    //
-    //    #[test]
-    //    fn indy_crypto_anoncreds_prover_proof_builder_finalize_works() {
-    //        let uuid = CString::new("uuid").unwrap();
-    //        let (issuer_pub_key, issuer_priv_key) = _issuer_keys();
-    //        let (rev_reg_pub, rev_reg_priv) = _revocation_registry(issuer_pub_key);
-    //        let master_secret = _master_secret();
-    //        let (blinded_master_secret, blinded_master_secret_data) = _blinded_master_secret(issuer_pub_key, master_secret);
-    //        let attr_values = _claim_attrs_values();
-    //        let attrs_with_predicates = _attrs_with_predicates();
-    //
-    //        let claim = _claim(blinded_master_secret, issuer_pub_key, issuer_priv_key, rev_reg_pub, rev_reg_priv, attr_values);
-    //
-    //        let mut proof_builder = _proof_builder();
-    //
-    //
-    //        indy_crypto_anoncreds_prover_proof_builder_add_claim(proof_builder,
-    //                                                             uuid.as_ptr(),
-    //                                                             claim,
-    //                                                             attr_values,
-    //                                                             issuer_pub_key,
-    //                                                             rev_reg_pub,
-    //                                                             attrs_with_predicates);
-    //
-    //        let nonce = _nonce();
-    //
-    //        let mut proof: *const c_void = ptr::null();
-    //        let err_code = indy_crypto_anoncreds_prover_proof_builder_finalize(proof_builder,
-    //                                                                           nonce,
-    //                                                                           master_secret,
-    //                                                                           &mut proof);
-    //        assert_eq!(err_code, ErrorCode::Success);
-    //        assert!(!proof.is_null());
-    //        //
-    //        //        _free_proof(proof);
-    //    }
-    //
+
+    #[test]
+    fn indy_crypto_anoncreds_prover_proof_builder_finalize_works() {
+        super::super::indy_crypto_init_logger();
+        let uuid = CString::new("uuid").unwrap();
+        let (issuer_pub_key, issuer_priv_key) = _issuer_keys();
+        let (rev_reg_pub, rev_reg_priv) = _revocation_registry(issuer_pub_key);
+        let master_secret = _master_secret();
+        let (blinded_master_secret, blinded_master_secret_data) = _blinded_master_secret(issuer_pub_key, master_secret);
+        let attr_values = _claim_attrs_values();
+        let attrs_with_predicates = _attrs_with_predicates();
+
+        let claim = _claim(blinded_master_secret, issuer_pub_key, issuer_priv_key, rev_reg_pub, rev_reg_priv, attr_values);
+
+        let mut proof_builder = _proof_builder();
+
+
+        let mut err_code = indy_crypto_anoncreds_prover_proof_builder_add_claim(proof_builder,
+                                                             uuid.as_ptr(),
+                                                             claim,
+                                                             attr_values,
+                                                             issuer_pub_key,
+                                                             rev_reg_pub,
+                                                             attrs_with_predicates);
+        assert_eq!(err_code, ErrorCode::Success);
+
+        let nonce = _nonce();
+
+        let mut proof: *const c_void = ptr::null();
+        let err_code = indy_crypto_anoncreds_prover_proof_builder_finalize(proof_builder,
+                                                                           nonce,
+                                                                           master_secret,
+                                                                           &mut proof);
+        assert_eq!(err_code, ErrorCode::Success);
+        assert!(!proof.is_null());
+
+        _free_proof(proof);
+    }
+
     //    #[test]
     //    fn indy_crypto_anoncreds_proof_free_works() {
     //        let proof = _proof();

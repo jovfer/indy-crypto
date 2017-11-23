@@ -423,7 +423,7 @@ pub mod mocks {
         assert!(!issuer_pub_key.is_null());
         assert!(!issuer_priv_key.is_null());
 
-        _free_claim_attrs(claim_attrs);
+        //        _free_claim_attrs(claim_attrs);
 
         (issuer_pub_key, issuer_priv_key)
     }
@@ -440,7 +440,7 @@ pub mod mocks {
         let mut rev_reg_pub: *const c_void = ptr::null();
         let mut rev_reg_priv: *const c_void = ptr::null();
 
-        let err_code = indy_crypto_anoncreds_issuer_new_revocation_registry(issuer_pub_key, 100, &mut rev_reg_pub, &mut rev_reg_priv);
+        let err_code = indy_crypto_anoncreds_issuer_new_revocation_registry(issuer_pub_key, 2, &mut rev_reg_pub, &mut rev_reg_priv);
         assert_eq!(err_code, ErrorCode::Success);
         assert!(!rev_reg_pub.is_null());
         assert!(!rev_reg_priv.is_null());

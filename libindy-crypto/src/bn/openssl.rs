@@ -74,8 +74,8 @@ impl BigNumber {
     }
 
     pub fn is_prime(&self, ctx: Option<&mut BigNumberContext>) -> Result<bool, IndyCryptoError> {
-        let prime_len = self.to_dec()?.len();
-        let checks = prime_len.log2() as i32;
+//        let prime_len = self.to_dec()?.len();
+        let checks = 2;//prime_len.log2() as i32;
         match ctx {
             Some(context) => Ok(self.openssl_bn.is_prime(checks, &mut context.openssl_bn_context)?),
             None => {
